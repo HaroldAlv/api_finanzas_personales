@@ -1,0 +1,9 @@
+# Python bytecode (compilados)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Bases de datos locales
+*.db
+*.sqlite3
