@@ -25,9 +25,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from app.api.transactions import router as transactions_router
+from app.api.batch import router as batch_router
+
+app.include_router(transactions_router)
+app.include_router(batch_router)
+
 @app.get("/ping")
 def ping():
     return {"status": "ok", "message": "PersonalFinances Microservice is running."}
+
 
 @app.get("/api/secure-ping")
 def secure_ping(tenant_id: str = Depends(get_tenant_id)):
