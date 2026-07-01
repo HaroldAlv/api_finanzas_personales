@@ -40,7 +40,7 @@ async def save_upload_file(upload_file: UploadFile, tenant_id: str) -> str:
     filename = f"{file_id}{ext}"
     
     # Asegurar directorio
-    tenant_dir = os.path.join(settings.UPLOAD_DIR, tenant_id)
+    tenant_dir = os.path.join(settings.UPLOAD_DIR)
     os.makedirs(tenant_dir, exist_ok=True)
     
     file_path = os.path.join(tenant_dir, filename)

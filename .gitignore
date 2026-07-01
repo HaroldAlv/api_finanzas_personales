@@ -1,0 +1,61 @@
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Variables de entorno
+.env
+*.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Base de datos local
+*.db
+*.sqlite3
+
+# PyInstaller
+dist/
+build/
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Entornos virtuales
+venv_build/
+.venv/
+venv/
+env/
+
+# Build/dist
+build/
+dist/
+*.spec
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyd
+
+ffmpeg.exe
+*.log
+.log
+.iss
+.exe
+engine.log
+py_version.python-version
+railway.toml
+.vscode

@@ -1,19 +1,16 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from sqlmodel import SQLModel
-from app.db.database import engine
 from app.core.security import get_tenant_id
 
-# Import models so they are registered with SQLModel metadata
-from app.models import financial
+# Database is managed via Alembic migrations.
+# After modifying models, run:
+#   alembic revision --autogenerate -m "description"
+#   alembic upgrade head
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Initialize DB and create tables on startup
-    SQLModel.metadata.create_all(engine)
     yield
-    # Cleanup on shutdown (if any)
 
 app = FastAPI(title="PersonalFinances API", lifespan=lifespan)
 

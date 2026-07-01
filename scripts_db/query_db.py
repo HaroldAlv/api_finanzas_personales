@@ -6,10 +6,8 @@ from datetime import datetime
 import os
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-# Based on DATABASE_URL = "sqlite:///../data/personal_finances.db" in app/core/config.py
-# The relative path resolves from the project root to repos/data/
 PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, ".."))
-DB_PATH = os.path.join(PROJECT_ROOT, "..", "data", "personal_finances.db")
+DB_PATH = os.path.join(PROJECT_ROOT, "app", "data", "personal_finances.db")
 
 def get_conn():
     conn = sqlite3.connect(DB_PATH)
@@ -77,6 +75,34 @@ def show_transactions(limit=20, status=None):
     print(f"\n{len(rows)} transaccion(es)")
     conn.close()
 
+def show_accounts(limit=20):
+    conn = get_conn()
+    rows = conn.execute("""
+        SELECT a.*, (SELECT COUNT(*) FROM "transaction" t WHERE t.account_id = a.id AND t.is_active = 1) as tx_count
+        FROM "account" a
+        ORDER BY a.id DESC LIMIT ?
+    """, (limit,)).fetchall()
+    if not rows:
+        print("(no accounts)")
+    for r in rows:
+        d = dict(r)
+        print(f"ID={d['id']:3d} | {d['name']:25s} | balance=${d['balance']:>8.2f} | txs={d['tx_count']:3d} | active={d['is_active']}")
+    conn.close()
+
+def show_categories(limit=20):
+    conn = get_conn()
+    rows = conn.execute("""
+        SELECT c.*, (SELECT COUNT(*) FROM "transaction" t WHERE t.category_id = c.id AND t.is_active = 1) as tx_count
+        FROM "category" c
+        ORDER BY c.id DESC LIMIT ?
+    """, (limit,)).fetchall()
+    if not rows:
+        print("(no categories)")
+    for r in rows:
+        d = dict(r)
+        print(f"ID={d['id']:3d} | {d['name']:25s} | txs={d['tx_count']:3d} | active={d['is_active']}")
+    conn.close()
+
 def show_batches(limit=10):
     conn = get_conn()
     rows = conn.execute("""
@@ -94,7 +120,7 @@ def show_batches(limit=10):
 def run():
     parser = argparse.ArgumentParser(description="Query personal_finances.db")
     parser.add_argument("action", nargs="?", default="tables",
-                        choices=["tables", "schema", "query", "txs", "batches"],
+                        choices=["tables", "schema", "query", "txs", "batches", "accounts", "categories"],
                         help="Accion a ejecutar")
     parser.add_argument("--sql", help="SQL query personalizada")
     parser.add_argument("--table", help="Mostrar esquema de una tabla especifica")
@@ -114,6 +140,10 @@ def run():
         query(args.sql)
     elif args.action == "txs":
         show_transactions(args.limit, args.status)
+    elif args.action == "accounts":
+        show_accounts(args.limit)
+    elif args.action == "categories":
+        show_categories(args.limit)
     elif args.action == "batches":
         show_batches(args.limit)
 
