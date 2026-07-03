@@ -14,7 +14,7 @@ router = APIRouter(prefix="/batch", tags=["Batch Processing"])
 @router.post("/ingest", response_model=BatchCreateResponse)
 async def bulk_ingest(
     background_tasks: BackgroundTasks,
-    account_id: int = Form(...),
+    id_from_account: int = Form(...),
     files: List[UploadFile] = File(...),
     session: Session = Depends(get_session),
     tenant_id: str = Depends(get_tenant_id)
@@ -45,7 +45,7 @@ async def bulk_ingest(
         batch_id=batch.id, 
         file_paths=saved_paths, 
         tenant_id=tenant_id,
-        account_id=account_id
+        id_from_account=id_from_account
     )
     
     return BatchCreateResponse(

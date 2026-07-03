@@ -6,8 +6,9 @@ from sqlmodel import Session
 from app.db.database import engine
 from app.models.financial import BatchIngestion, Transaction, Account
 from app.services.ai_extraction import extract_transaction_data
+from app.core.config import settings
 
-async def process_batch(batch_id: int, file_paths: List[str], tenant_id: str, account_id: int):
+async def process_batch(batch_id: int, file_paths: List[str], tenant_id: str, id_from_account: int):
     """
     Procesamiento asíncrono en segundo plano para lotes de archivos.
     """
@@ -31,17 +32,20 @@ async def process_batch(batch_id: int, file_paths: List[str], tenant_id: str, ac
                 except ValueError:
                     tx_date = datetime.utcnow()
                     
-                # Crear transacción
+                # Crear transacción (usar IA sugerida si está disponible)
                 new_tx = Transaction(
                     amount=extraction.amount,
                     date=tx_date,
-                    merchant=extraction.merchant,
-                    description=extraction.description,
+                    name_destination=extraction.name_destination,
+                    name_from=settings.USER_FULL_NAME,
+                    description=extraction.description or extraction.name_destination,
+                    transaction_type="expense",
                     source="bulk",
                     original_file_path=file_path,
                     status="PendingReview",
                     batch_id=batch_id,
-                    account_id=account_id,
+                    id_from_account=extraction.suggested_from_account_id or id_from_account,
+                    id_destination_account=extraction.suggested_destination_account_id,
                     category_id=extraction.suggested_category_id,
                     tenant_id=tenant_id
                 )

@@ -78,7 +78,7 @@ def show_transactions(limit=20, status=None):
 def show_accounts(limit=20):
     conn = get_conn()
     rows = conn.execute("""
-        SELECT a.*, (SELECT COUNT(*) FROM "transaction" t WHERE t.account_id = a.id AND t.is_active = 1) as tx_count
+        SELECT a.*, (SELECT COUNT(*) FROM "transaction" t WHERE (t.id_from_account = a.id OR t.id_destination_account = a.id) AND t.is_active = 1) as tx_count
         FROM "account" a
         ORDER BY a.id DESC LIMIT ?
     """, (limit,)).fetchall()
@@ -86,7 +86,7 @@ def show_accounts(limit=20):
         print("(no accounts)")
     for r in rows:
         d = dict(r)
-        print(f"ID={d['id']:3d} | {d['name']:25s} | balance=${d['balance']:>8.2f} | txs={d['tx_count']:3d} | active={d['is_active']}")
+        print(f"ID={d['id']:3d} | {d['name']:25s} | {d['type']:16s} | txs={d['tx_count']:3d}")
     conn.close()
 
 def show_categories(limit=20):
@@ -100,7 +100,7 @@ def show_categories(limit=20):
         print("(no categories)")
     for r in rows:
         d = dict(r)
-        print(f"ID={d['id']:3d} | {d['name']:25s} | txs={d['tx_count']:3d} | active={d['is_active']}")
+        print(f"ID={d['id']:3d} | {d['name']:25s} | {d.get('description', '') or '':30s} | txs={d['tx_count']:3d}")
     conn.close()
 
 def show_batches(limit=10):
