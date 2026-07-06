@@ -41,8 +41,6 @@ def create_transaction(
 
 @router.post("/smart-ingest", response_model=SmartIngestionResponse)
 async def smart_ingest(
-    id_from_account: int = Form(...),
-    id_destination_account: Optional[int] = Form(None),
     file: UploadFile = File(...),
     session: Session = Depends(get_session),
     tenant_id: str = Depends(get_tenant_id)
@@ -74,8 +72,8 @@ async def smart_ingest(
         source="smart_ingestion",
         original_file_path=file_path,
         status="PendingReview",
-        id_from_account=id_from_account,
-        id_destination_account=id_destination_account or extraction.suggested_destination_account_id,
+        id_from_account=extraction.suggested_from_account_id,
+        id_destination_account=extraction.suggested_destination_account_id,
         category_id=extraction.suggested_category_id,
         tenant_id=tenant_id
     )
